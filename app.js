@@ -48,7 +48,7 @@ container.style.height = "300px"
 container.style.position = "fixed"
 container.style.right = "-250px"
 container.style.top = "60%"
-container.style.zIndex = 999
+container.style.zIndex = 9999999
 container.style.overflow = "hidden"
 container.style.padding = 0
 container.style.borderRadius = "5px"
@@ -80,6 +80,7 @@ notificationBox2.style.justifyContent = "space-between"
 notificationBox2.style.padding = "0 2px 0 0"
 notificationBox2.style.cursor = "pointer"
 notificationBox2.style.marginLeft = "2px"
+notificationBox2.style.gap = "5px"
 
 notificationBox3.style.display = "flex"
 notificationBox3.style.alignItems = "center"
@@ -87,6 +88,14 @@ notificationBox3.style.justifyContent = "space-between"
 notificationBox3.style.padding = "0 2px 0 0"
 notificationBox3.style.cursor = "pointer"
 notificationBox3.style.marginLeft = "2px"
+
+notificationArea1.style.marginBottom = "10px"
+notificationArea1.style.marginRight = "5px"
+
+notificationArea2.style.marginBottom = "10px"
+notificationArea2.style.marginRight = "5px"
+
+notificationArea3.style.marginRight = "5px"
 
 hideButton.style.outline = "none"
 hideButton.style.border = "none"
@@ -96,151 +105,77 @@ hideButton.style.left = 0
 hideButton.style.bottom = 0
 
 //JS
-var productTypesList = localStorage.getItem("product-types") ? JSON.parse(localStorage.getItem("product-types")) : []
-var titleWords = []
+var productNamesList = localStorage.getItem("product-names") ? JSON.parse(localStorage.getItem("product-names")) : []
+var productImagesList = localStorage.getItem("product-images") ? JSON.parse(localStorage.getItem("product-images")) : []
+var productPricesList = localStorage.getItem("product-prices") ? JSON.parse(localStorage.getItem("product-prices")) : []
+localStorage.setItem("product-names", JSON.stringify(productNamesList))
+localStorage.setItem("product-images", JSON.stringify(productImagesList))
+localStorage.setItem("product-prices", JSON.stringify(productPricesList))
 var notificationBoxes = [notificationBox1, notificationBox2, notificationBox3]
 var notificationAreas = [notificationArea1, notificationArea2, notificationArea3]
 //ADDING PRODUCT TYPES TO LOCAL STORAGE
 var products = document.getElementsByClassName("product-card")
 for(let i = 0; i < products.length; i++) {
     products[i].addEventListener("click", () => {
-        productTypesList = localStorage.getItem("product-types") ? JSON.parse(localStorage.getItem("product-types")) : []
-        titleWords = products[i].lastChild.getAttribute("title").split(' ')
-        productTypesList.push(titleWords[titleWords.length - 1])
-        localStorage.setItem("product-types", JSON.stringify(productTypesList))
-        titleWords = []
+        var productNamesList = localStorage.getItem("product-names") ? JSON.parse(localStorage.getItem("product-names")) : []
+        var productImagesList = localStorage.getItem("product-images") ? JSON.parse(localStorage.getItem("product-images")) : []
+        var productPricesList = localStorage.getItem("product-prices") ? JSON.parse(localStorage.getItem("product-prices")) : []
+        if(productNamesList.length < 3) {
+            productNamesList.push(products[i].lastChild.lastChild.childNodes[1].textContent)
+            productImagesList.push(products[i].lastChild.firstChild.childNodes[1].getAttribute("src"))
+            productPricesList.push(products[i].lastChild.lastChild.childNodes[3].firstChild.firstChild.textContent)
+            localStorage.setItem("product-names", JSON.stringify(productNamesList))
+            localStorage.setItem("product-images", JSON.stringify(productImagesList))
+            localStorage.setItem("product-prices", JSON.stringify(productPricesList))
+        }
+        else {
+            productNamesList.push(products[i].lastChild.lastChild.childNodes[1].textContent)
+            productImagesList.push(products[i].lastChild.firstChild.childNodes[1].getAttribute("src"))
+            productPricesList.push(products[i].lastChild.lastChild.childNodes[3].firstChild.firstChild.textContent)
+            productNamesList.shift()
+            productImagesList.shift()
+            productPricesList.shift()
+            localStorage.setItem("product-names", JSON.stringify(productNamesList))
+            localStorage.setItem("product-images", JSON.stringify(productImagesList))
+            localStorage.setItem("product-prices", JSON.stringify(productPricesList))
+        }
         //SHOWING NOTIFICATION CENTER IF CONDITIONS ARE MET
-        if(productTypesList.length >= 3 && !document.URL.includes("/etiket/")) {
-            showNotificationCenter(productTypesList, notificationAreas, notificationBoxes)
+        if(productNamesList.length >= 3 && !document.URL.includes("/etiket/")) {
+            showNotificationCenter(productNamesList, productImagesList, productPricesList, notificationAreas, notificationBoxes)
         }
     })
 }
 
 //SHOWING NOTIFICATION CENTER IF CONDITIONS ARE MET
-if(productTypesList.length >= 3 && !document.URL.includes("/etiket/")) {
-    showNotificationCenter(productTypesList, notificationAreas, notificationBoxes)
+if(productNamesList.length >= 3 && !document.URL.includes("/etiket/")) {
+    showNotificationCenter(productNamesList, productImagesList, productPricesList, notificationAreas, notificationBoxes)
 }
 
-function showNotificationCenter(productTypesList, notificationAreas, notificationBoxes) {
-    for(let i = productTypesList.length - 1; i > productTypesList.length - 4; i--) {
+function showNotificationCenter(productNamesList, productImagesList, productPricesList, notificationAreas, notificationBoxes) {
+    var newPrice
+    for(let i = productNamesList.length - 1; i > productNamesList.length - 4; i--) {
         //SHOWING NOTIFICATIONS ACCORDING TO PRODUCTS THAT USER HAVE VISITED
-        if(productTypesList[i] == "Ceket") {
-            var picture = document.createElement("img")
-            picture.setAttribute("src", "https://img-lcwaikiki.mncdn.com/mnresize/600/-/pim/productimages/20221/5679624/v1/l_20221-s2bo78z8-ruj_a.jpg")
-            picture.style.width = "75px"
-            picture.style.height = "75px"
-            picture.style.marginRight = "10px"
-            notificationBoxes[productTypesList.length - 1 - i].append(picture)
-            var notificationTitle = document.createElement("h3")
-            notificationTitle.innerText = "Tüm Ceketlerde 20% İndirim!!"
-            notificationTitle.style.fontSize = "12px"
-            notificationTitle.style.fontWeight = "bold"
-            notificationTitle.style.marginTop = "10px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationTitle)
-            var notificationP = document.createElement("p")
-            notificationP.innerText = "Tüm Ceketlerde 20%'ye Varan İndirimleri Kaçırma!!"
-            notificationP.style.fontSize = "12px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationP)
-        }
-        else if(productTypesList[i] == "Gömlek") {
-            var picture = document.createElement("img")
-            picture.setAttribute("src", "https://img-lcwaikiki.mncdn.com/mnresize/600/-/pim/productimages/20221/5662321/l_20221-s2au16z8-uda_a.jpg")
-            picture.style.width = "75px"
-            picture.style.height = "75px"
-            picture.style.marginRight = "10px"
-            notificationBoxes[productTypesList.length - 1 - i].append(picture)
-            var notificationTitle = document.createElement("h3")
-            notificationTitle.innerText = "Tüm Gömleklerde 15% İndirim!!"
-            notificationTitle.style.fontSize = "12px"
-            notificationTitle.style.fontWeight = "bold"
-            notificationTitle.style.marginTop = "10px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationTitle)
-            var notificationP = document.createElement("p")
-            notificationP.innerText = "Tüm Gömleklerde 15%'ye Varan İndirimleri Kaçırma!!"
-            notificationP.style.fontSize = "12px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationP)
-        }
-        else if(productTypesList[i] == "Pantolon") {
-            var picture = document.createElement("img")
-            picture.setAttribute("src", "https://img-lcwaikiki.mncdn.com/mnresize/600/-/pim/productimages/20221/5670461/v1/l_20221-s2be61z8-r9j_u.jpg")
-            picture.style.width = "75px"
-            picture.style.height = "75px"
-            picture.style.marginRight = "10px"
-            notificationBoxes[productTypesList.length - 1 - i].append(picture)
-            var notificationTitle = document.createElement("h3")
-            notificationTitle.innerText = "Tüm Pantolonlarda 25% İndirim!!"
-            notificationTitle.style.fontSize = "12px"
-            notificationTitle.style.fontWeight = "bold"
-            notificationTitle.style.marginTop = "10px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationTitle)
-            var notificationP = document.createElement("p")
-            notificationP.innerText = "Tüm Pantolonlarda 25%'ye Varan İndirimleri Kaçırma!!"
-            notificationP.style.fontSize = "12px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationP)
-        }
-        else if(productTypesList[i] == "Şort") {
-            var picture = document.createElement("img")
-            picture.setAttribute("src", "https://img-lcwaikiki.mncdn.com/mnresize/600/-/pim/productimages/20221/5533240/l_20221-s24218z8-cuz_a.jpg")
-            picture.style.width = "75px"
-            picture.style.height = "75px"
-            picture.style.marginRight = "10px"
-            notificationBoxes[productTypesList.length - 1 - i].append(picture)
-            var notificationTitle = document.createElement("h3")
-            notificationTitle.innerText = "Tüm Şortlarda 10% İndirim!!"
-            notificationTitle.style.fontSize = "12px"
-            notificationTitle.style.fontWeight = "bold"
-            notificationTitle.style.marginTop = "10px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationTitle)
-            var notificationP = document.createElement("p")
-            notificationP.innerText = "Tüm Şortlarda 10%'ye Varan İndirimleri Kaçırma!!"
-            notificationP.style.fontSize = "12px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationP)
-        }
-        else if(productTypesList[i] == "Tişört") {
-            var picture = document.createElement("img")
-            picture.setAttribute("src", "https://img-lcwaikiki.mncdn.com/mnresize/600/-/pim/productimages/20221/5581081/l_20221-s25873z8-cvl_a.jpg")
-            picture.style.width = "75px"
-            picture.style.height = "75px"
-            picture.style.marginRight = "10px"
-            notificationBoxes[productTypesList.length - 1 - i].append(picture)
-            var notificationTitle = document.createElement("h3")
-            notificationTitle.innerText = "Tüm Tişörtlerde 20% İndirim!!"
-            notificationTitle.style.fontSize = "12px"
-            notificationTitle.style.fontWeight = "bold"
-            notificationTitle.style.marginTop = "10px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationTitle)
-            var notificationP = document.createElement("p")
-            notificationP.innerText = "Tüm Tişörtlerde 20%'ye Varan İndirimleri Kaçırma!!"
-            notificationP.style.fontSize = "12px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationP)
-        }
-        else if(productTypesList[i] == "Sweatshirt") {
-            var picture = document.createElement("img")
-            picture.setAttribute("src", "https://img-lcwaikiki.mncdn.com/mnresize/600/-/productimages/20201/1/3875172/l_20201-0s3718z8-mfw_a.jpg")
-            picture.style.width = "75px"
-            picture.style.height = "75px"
-            picture.style.marginRight = "10px"
-            notificationBoxes[productTypesList.length - 1 - i].append(picture)
-            var notificationTitle = document.createElement("h3")
-            notificationTitle.innerText = "Tüm Sweatshirtlerde 25% İndirim!!"
-            notificationTitle.style.fontSize = "12px"
-            notificationTitle.style.fontWeight = "bold"
-            notificationTitle.style.marginTop = "10px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationTitle)
-            var notificationP = document.createElement("p")
-            notificationP.innerText = "Tüm Sweatshirtlerde 25%'ye Varan İndirimleri Kaçırma!!"
-            notificationP.style.fontSize = "12px"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationP)
-        }
-        else {
-            var notificationTitle = document.createElement("h3")
-            notificationTitle.innerText = "Diğer Ürünlerde Kampanyamız Yoktur."
-            notificationTitle.style.fontSize = "12px"
-            notificationTitle.style.fontWeight = "bold"
-            notificationTitle.style.marginTop = "10px"
-            notificationTitle.style.textAlign = "center"
-            notificationAreas[productTypesList.length - 1 - i].append(notificationTitle)
-        }
+        var picture = document.createElement("img")
+            picture.setAttribute("src", productImagesList[productImagesList.length - 1 - i])
+        picture.style.width = "45px"
+        picture.style.height = "60px"
+        picture.style.marginLeft = "50px"
+        picture.style.marginBottom = "10px"
+        notificationBoxes[productNamesList.length - 1 - i].append(picture)
+        var notificationTitle = document.createElement("h3")
+        notificationTitle.innerText = productNamesList[productNamesList.length - 1 - i]
+        notificationTitle.style.fontSize = "10px"
+        notificationTitle.style.fontWeight = "bold"
+        notificationTitle.style.marginTop = "10px"
+        notificationTitle.style.textAlign = "left"
+        notificationAreas[productNamesList.length - 1 - i].append(notificationTitle)
+        newPrice = parseInt(productPricesList[productPricesList.length - 1 - i])
+        newPrice = newPrice * 75 / 100
+        Math.floor(newPrice)
+        var notificationP = document.createElement("p")
+        notificationP.innerText = newPrice
+        notificationP.style.fontSize = "12px"
+        notificationAreas[productNamesList.length - 1 - i].append(notificationP)
     }
     container.style.right = 0
 }
